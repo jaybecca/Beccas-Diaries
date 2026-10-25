@@ -1,0 +1,86 @@
+name: Beccas Diaries DevSecOps
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: devsecops-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Validate static website
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check required website files
+        run: |
+          set -eu
+          test -f index.html
+          test -f article.html
+          test -f admin.html
+          test -d assets
+          test -d css
+          test -d js
+          test -d supabase
+          echo "Required website files and folders are present."
+
+      - name: Check JavaScript syntax
+        run: |
+          set -eu
+          find js -type f -name '*.js' -print0 |
+            while IFS= read -r -d '' file; do
+              echo "Checking $file"
+              node --check "$file"
+            done
+
+      - name: Check JSON configuration syntax
+        run: |
+          set -eu
+          find . -type f -name '*.json' \
+            -not -path './.git/*' -print0 |
+            while IFS= read -r -d '' file; do
+              echo "Checking $file"
+              node -e \
+                'JSON.parse(require("fs").readFileSync(process.argv[1], "utf8"))' \
+                "$file"
+            done
+
+  secret-scan:
+    name: Scan for leaked secrets
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Gitleaks scan
+        uses: gitleaks/gitleaks-action@v2
+
+  security-scan:
+    name: Trivy security scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Scan repository for vulnerabilities, secrets and misconfiguration
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          scanners: vuln,misconfig,secret
+          severity: HIGH,CRITICAL
+          format: table
+          exit-code: '1'
+          ignore-unfixed: true
