@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Thoughtful Christian articles for growing in faith, understanding Scripture, prayer and everyday life.">
+  <meta name="theme-color" content="#5d3b93">
+  <link rel="icon" href="assets/favicon.svg"><title>Faith & Light — Grow in faith, live in hope</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <a class="brand" href="index.html">
+        <img src="assets/logo.png" alt="Beccas" width="50" height="50"><span>Beccas <i>Diaries</i> .<small>GROW IN FAITH · LIVE IN TRUTH</small></span></a>
+  <button class="menu-toggle" aria-label="Open menu" aria-expanded="false">☰</button>
+  <nav class="main-nav"><a class="active" href="#home">Home</a><a href="#topics">Explore topics</a><a href="#latest">Latest articles</a><a href="#about">Our purpose</a><a class="nav-cta" hre="admin">.</a></nav>
+</header>
+<main>
+  <section class="hero" id="home">
+    <div class="hero-copy">
+      <span class="eyebrow"><span class="eyebrow-dot"></span> A place for faith <i>&</i>knowledge to flourish</span>
+      <h1>Rooted in truth.<br><em>Growing in grace.</em></h1>
+      <p class="hero-lede">A welcoming space to explore God's Word, strengthen your faith, and find encouragement for the everyday journey with Christ.</p>
+      <div class="hero-actions"><a class="button button-primary" href="#latest">Explore the articles <span>↗</span></a><a class="text-link" href="#topics">Browse by topic <span>↓</span></a></div>
+      <div class="hero-note"><span class="note-icon">✧</span><span>“Your word is a lamp to my feet and a light to my path.”<small>PSALM 119:105</small></span></div>
+    </div>
+    <div class="hero-art" aria-label="Decorative illustration of an open Bible and flowers">
+      <div class="sun-disc"></div><div class="leaf leaf-one"></div><div class="leaf leaf-two"></div>
+      <div class="book"><div class="book-page left-page"><span></span><span></span><span></span><span></span><span></span></div><div class="book-page right-page"><b>Be still<br>and know</b><span></span><span></span><span></span></div></div>
+      <div class="art-label">A loving light<br>for your day <span>✦</span></div>
+      <div class="floating-flower flower-a">✿</div><div class="floating-flower flower-b">✽</div>
+    </div>
+  </section>
+
+  <section class="welcome-band" id="about">
+    <div class="welcome-icon">♡</div><div><span class="eyebrow">A gentle invitation</span><h2>Faith is a journey. You don't have to walk it alone.</h2></div>
+    <p>Whether you're opening your Bible for the first time or deepening a lifelong walk with God, find practical reflections, Scripture-led insights and reminders of hope for every season.</p>
+  </section>
+
+  <section class="section topics-section" id="topics">
+    <div class="section-heading"><div><span class="eyebrow">Find what speaks to you</span><h2>Explore the <em>topics</em></h2><p>Start with a subject on your heart. Follow the smaller themes to discover articles made for real life.</p></div><a class="text-link" href="#latest">View all articles ↗</a></div>
+    <div class="topic-grid" id="topicGrid"></div>
+  </section>
+
+  <section class="featured-section">
+    <div class="featured-art"><div class="featured-circle">✦</div><div class="featured-quote">Grace for<br>today.<br><em>Hope for<br>tomorrow.</em></div><span class="featured-reference">2 CORINTHIANS 12:9</span></div>
+    <div class="featured-copy"><span class="eyebrow">A moment to reflect</span><h2>You can begin again<br><em>with God.</em></h2><p>Some days call for a fresh start, a quiet prayer, or a reminder that God's grace is not exhausted by yesterday. Take a breath, return to the truth, and take your next small step in faith.</p><a class="button button-light" href="#latest">Find encouragement <span>↗</span></a></div>
+  </section>
+
+  <section class="section latest-section" id="latest">
+    <div class="section-heading"><div><span class="eyebrow">Read, reflect, grow</span><h2>Words for your <em>walk</em></h2><p>Short, thoughtful reads to help you carry faith into everyday life.</p></div></div>
+    <div class="filter-row"><label class="search-box"><span>⌕</span><input id="searchInput" type="search" placeholder="Search articles or Scripture…" aria-label="Search articles"></label><select id="categoryFilter" aria-label="Filter by category"><option value="all">All topics</option></select></div>
+    <div class="article-grid" id="articleGrid"></div>
+    <div class="empty-state" id="emptyState" hidden><span>✧</span><h3>No articles found just yet</h3><p>Try another search, or check back as new reflections are published.</p></div>
+    <div class="center-action"><button class="button button-outline" id="showMore" hidden>Show more articles ↓</button></div>
+  </section>
+
+  <section class="newsletter-section"><div class="newsletter-spark">✦</div><span class="eyebrow">A little encouragement</span><h2>Make room for <em>hope.</em></h2><p>Come back whenever you need a moment in Scripture, a thoughtful reflection, or a reminder of what matters most.</p><a class="button button-primary" href="#topics">Find your next read <span>↗</span></a></section>
+</main>
+<footer class="site-footer"><a class="brand footer-brand" href="#home"><img src="assets/logo.png" alt="Beccas" width="50" height="50"><span>Beccas <i>Diaries</i> .<small>GROW IN FAITH · LIVE IN TRUTH</small></span></a><p>Scripture, reflection and encouragement for everyday life.</p><div><a href="#topics">Topics</a><a href="#latest">Articles</a><a href="admin.html">Terms</a></div><small>© <span id="year"></span> Beccas Diaries. Made with Love, Faith and Hope.</small></footer>
+      
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="js/config.js"></script>
+<script src="js/content.js"></script>
+<script src="js/site.js"></script>
+  <!--=========================================
+        FLOATING WHATSAPP BUTTON
+==========================================-->
+
+<a
+    href="https://wa.me/2348051755445?text=Hello%20Beccas%20Diaries,%20I%20want%20to%20know%20more%20about%20a%20topic."
+    class="whatsapp-float"
+    target="_blank"
+    aria-label="Chat with Beccas Diaries on WhatsApp"
+>
+
+    <span class="whatsapp-tooltip">
+
+        Chat with us
+
+    </span>
+
+    <i class="fab fa-whatsapp"></i>
+
+</a>
+</body></html>
