@@ -46,3 +46,14 @@
     opacity:1;
     visibility:visible;
 }
+
+
+/* WhatsApp floating logo */
+.whatsapp-float .whatsapp-icon {
+  display: block;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 auto;
+  color: #fff;
+  fill: currentColor;
+}
