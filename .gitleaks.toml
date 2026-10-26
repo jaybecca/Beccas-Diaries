@@ -1,0 +1,11 @@
+title = "Beccas Diaries Secret Scanning"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Supabase publishable keys are intended for frontend use"
+regexTarget = "match"
+regexes = [
+  '''sb_publishable_[A-Za-z0-9_-]+'''
+]
