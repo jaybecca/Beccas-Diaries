@@ -1,0 +1,23 @@
+name = "beccas-diaries"
+main = "worker.js"
+compatibility_date = "2026-10-29"
+workers_dev = true
+keep_vars = true
+
+[assets]
+directory = "."
+binding = "ASSETS"
+run_worker_first = ["/api/*"]
+
+[[r2_buckets]]
+binding = "MEDIA_BUCKET"
+bucket_name = "beccas-diaries-media"
+
+[[routes]]
+pattern = "christ.tampconsulting.space"
+custom_domain = true
+
+# Separate R2 storage for Cloudflare Preview deployments
+[[previews.r2_buckets]]
+binding = "MEDIA_BUCKET"
+bucket_name = "beccas-diaries-preview"
