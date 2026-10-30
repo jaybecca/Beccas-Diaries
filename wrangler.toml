@@ -16,3 +16,8 @@ bucket_name = "beccas-diaries-media"
 [[routes]]
 pattern = "christ.tampconsulting.space"
 custom_domain = true
+
+# Separate R2 storage for Cloudflare Preview deployments
+[[previews.r2_buckets]]
+binding = "MEDIA_BUCKET"
+bucket_name = "beccas-diaries-preview"
