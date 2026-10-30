@@ -54,3 +54,26 @@ The homepage and article pages can read published articles from Supabase when th
 
 ## Customise the branding
 Search the project for `Faith & Light` and replace it with your chosen ministry/blog name. Colours, typography, and layout live in `css/styles.css`.
+
+
+## Audio and video media studio
+
+The admin dashboard includes 10 video slots and 10 audio slots. Media objects are stored in a private Cloudflare R2 bucket and served through `functions/api/media.js`; only published items are available to visitors. Each slot supports an optional HTTPS social link.
+
+### Supabase migration
+
+After confirming your existing Supabase schema is already applied, run `supabase/media-schema.sql` in the Supabase SQL Editor. This creates the media slot table and row-level policies. Keep your existing `js/config.js` and its `window.FAITH_CONFIG` values; this archive deliberately does not contain that file or any credentials. Use only the Supabase publishable/anon key in browser configuration. Never place a service-role or secret key in frontend code.
+
+### Cloudflare setup
+
+1. Create a **private** R2 bucket named `beccas-diaries-media` (or update `wrangler.toml` to your chosen bucket).
+2. Bind that bucket to the Pages project using binding name `MEDIA_BUCKET`.
+3. Add `SUPABASE_URL` and `SUPABASE_ANON_KEY` as Cloudflare Pages server-side variables.
+4. Add `MEDIA_ADMIN_USER_IDS` as a Cloudflare secret/variable containing the UUID of the authorised Supabase admin user. For multiple administrators, use comma-separated UUIDs. Without an allowlisted ID, media write operations are denied. Do not use a user-editable profile field for this allowlist.
+5. Deploy after configuring the R2 binding and server-side variables.
+
+### Upload limits and duration caveat
+
+The interface checks for a maximum duration of five minutes, and the API checks the submitted duration value, media type and file size (video 80 MB; audio 20 MB). **The supplied implementation does not independently decode/probe the uploaded file on the server**; a technically capable user could forge the submitted duration. Therefore the five-minute limit is currently a client-side policy check, not a tamper-proof server-enforced limit. If strict enforcement is required, add a trusted media-probing/transcoding service before enabling public uploads.
+
+The R2 bucket must remain private. Visitors can stream only database entries marked `published`; drafts are not exposed by the media endpoint.
