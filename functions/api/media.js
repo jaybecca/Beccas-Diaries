@@ -22,15 +22,35 @@ function getConfig(env) {
 }
 async function authenticate(request, env, config) {
   const token = (request.headers.get('Authorization') || '').replace(/^Bearer\s+/i, '').trim();
+  console.info('[media-auth] bearer_present:', Boolean(token));
   if (!token) return null;
-  const response = await fetch(`${config.url}/auth/v1/user`, { headers: { apikey: config.key, Authorization: `Bearer ${token}` } });
+
+  let response;
+  try {
+    response = await fetch(`${config.url}/auth/v1/user`, {
+      headers: { apikey: config.key, Authorization: `Bearer ${token}` }
+    });
+  } catch (error) {
+    console.error('[media-auth] supabase_request_failed:', error?.name || 'unknown');
+    return null;
+  }
+
+  console.info('[media-auth] supabase_user_http_status:', response.status);
   if (!response.ok) return null;
+
   const user = await response.json();
-  if (!user || !user.id) return null;
+  if (!user || !user.id) {
+    console.info('[media-auth] supabase_user_id_present: false');
+    return null;
+  }
+
   // Only explicitly allowlisted Supabase user IDs may upload, publish or delete media.
   // Configure MEDIA_ADMIN_USER_IDS as a Cloudflare secret/variable (comma-separated UUIDs).
   const allowedIds = String(env.MEDIA_ADMIN_USER_IDS || '').split(',').map(value => value.trim()).filter(Boolean);
-  if (!allowedIds.includes(user.id)) return null;
+  const isAllowlisted = allowedIds.includes(user.id);
+  console.info('[media-auth] admin_allowlist_match:', isAllowlisted);
+  if (!isAllowlisted) return null;
+
   return { id: user.id, token };
 }
 async function dbRequest(config, token, path, init = {}) {
