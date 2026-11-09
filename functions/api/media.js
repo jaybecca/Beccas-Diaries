@@ -189,7 +189,7 @@ async function uploadOrUpdate(request, env, config) {
 
 async function deleteMedia(request, env, config) {
   const admin = await authenticate(request, env, config);
-  if (!admin) return json({ error: 'Sign in with your Supabase admin account first.' }, 401);
+  if (admin?.failure) return authFailureResponse(admin);
   let body;
   try { body = await request.json(); } catch (_) { return json({ error: 'Expected JSON with media type and slot.' }, 400); }
   const type = String(body.type || ''), slot = Number(body.slot);
