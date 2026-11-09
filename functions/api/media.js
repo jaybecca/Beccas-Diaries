@@ -23,7 +23,7 @@ function getConfig(env) {
 async function authenticate(request, env, config) {
   const token = (request.headers.get('Authorization') || '').replace(/^Bearer\s+/i, '').trim();
   console.info('[media-auth] bearer_present:', Boolean(token));
-  if (!token) return null;
+  if (!token) return { failure: 'missing_bearer' };
 
   let response;
   try {
@@ -32,16 +32,16 @@ async function authenticate(request, env, config) {
     });
   } catch (error) {
     console.error('[media-auth] supabase_request_failed:', error?.name || 'unknown');
-    return null;
+    return { failure: 'supabase_request_error' };
   }
 
   console.info('[media-auth] supabase_user_http_status:', response.status);
-  if (!response.ok) return null;
+  if (!response.ok) return { failure: 'supabase_auth_rejected', status: response.status };
 
   const user = await response.json();
   if (!user || !user.id) {
     console.info('[media-auth] supabase_user_id_present: false');
-    return null;
+    return { failure: 'supabase_user_invalid' };
   }
 
   // Only explicitly allowlisted Supabase user IDs may upload, publish or delete media.
@@ -49,9 +49,17 @@ async function authenticate(request, env, config) {
   const allowedIds = String(env.MEDIA_ADMIN_USER_IDS || '').split(',').map(value => value.trim()).filter(Boolean);
   const isAllowlisted = allowedIds.includes(user.id);
   console.info('[media-auth] admin_allowlist_match:', isAllowlisted);
-  if (!isAllowlisted) return null;
+  if (!isAllowlisted) return { failure: 'admin_not_allowlisted' };
 
   return { id: user.id, token };
+}
+function authFailureResponse(admin) {
+  // Temporary, non-sensitive diagnostic: never include tokens, cookies, or user identifiers.
+  return json({
+    error: 'Sign in with your Supabase admin account first.',
+    diagnostic: admin?.failure || 'authentication_failed',
+    ...(Number.isInteger(admin?.status) ? { supabaseStatus: admin.status } : {})
+  }, 401);
 }
 async function dbRequest(config, token, path, init = {}) {
   const headers = new Headers(init.headers || {});
@@ -120,7 +128,7 @@ async function servePublishedMedia(request, env, config) {
 
 async function uploadOrUpdate(request, env, config) {
   const admin = await authenticate(request, env, config);
-  if (!admin) return json({ error: 'Sign in with your Supabase admin account first.' }, 401);
+  if (admin?.failure) return authFailureResponse(admin);
   const length = Number(request.headers.get('Content-Length') || 0);
   if (length && length > VIDEO_MAX_BYTES + 1024 * 1024) return json({ error: 'Upload request is too large.' }, 413);
   let form;
@@ -181,7 +189,7 @@ async function uploadOrUpdate(request, env, config) {
 
 async function deleteMedia(request, env, config) {
   const admin = await authenticate(request, env, config);
-  if (!admin) return json({ error: 'Sign in with your Supabase admin account first.' }, 401);
+  if (admin?.failure) return authFailureResponse(admin);
   let body;
   try { body = await request.json(); } catch (_) { return json({ error: 'Expected JSON with media type and slot.' }, 400); }
   const type = String(body.type || ''), slot = Number(body.slot);
